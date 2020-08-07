@@ -1,6 +1,9 @@
 package com.shaunmccready.upgradecampsite.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,10 +15,16 @@ public class Registration implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
+    @SequenceGenerator(name = "registration_id_seq", sequenceName = "public.registration_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "registration_id_seq")
+    private Integer id;
+
+    @NotBlank
     private String bookingId;
 
     @ManyToOne
     @JoinColumn(name = "camper_id", nullable = false)
+    @JsonIgnoreProperties("registrations")
     private Camper camper;
 
     private LocalDate reservationDate;
@@ -32,6 +41,15 @@ public class Registration implements Serializable {
         this.reservationDate = reservationDate;
         created = LocalDateTime.now();
         modified = LocalDateTime.now();
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public Registration setId(Integer id) {
+        this.id = id;
+        return this;
     }
 
     public String getBookingId() {

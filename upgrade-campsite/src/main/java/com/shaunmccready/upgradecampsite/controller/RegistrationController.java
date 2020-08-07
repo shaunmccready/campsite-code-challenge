@@ -27,8 +27,8 @@ public class RegistrationController {
 
 
     @GetMapping("/availability")
-    public ResponseEntity<AvailableDays> getAvailability(@RequestParam("from") String fromDate,
-                                                         @RequestParam("to") String toDate) {
+    public ResponseEntity<AvailableDays> getAvailability(@RequestParam(value = "from", required = false) String fromDate,
+                                                         @RequestParam(value = "to", required = false) String toDate) {
         AvailableDays availability = registrationService.getAvailability(fromDate, toDate);
         return ResponseEntity.ok(availability);
     }
@@ -45,5 +45,11 @@ public class RegistrationController {
                 .toUri();
 
         return ResponseEntity.created(location).body(reservedDates);
+    }
+
+    @DeleteMapping("/{bookingId}")
+    public ResponseEntity<List<Registration>> cancelReservation(@PathVariable("bookingId") String bookingId) {
+        List<Registration> cancelledDates = registrationService.cancelReservation(bookingId);
+        return ResponseEntity.accepted().body(cancelledDates);
     }
 }

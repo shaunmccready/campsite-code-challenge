@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,6 +26,7 @@ public class CamperService {
         return camperByEmail.orElseGet(() -> {
             String idOfNewCamper = UUID.randomUUID().toString();
             camper.setId(idOfNewCamper);
+            camper.setCreated(LocalDateTime.now());
             camperDao.save(camper);
             return camper;
         });

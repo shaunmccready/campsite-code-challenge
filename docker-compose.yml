@@ -1,8 +1,8 @@
 version: '3.1'
 services:
         postgresql-db:
-           image: postgres11
-           container_name: pg-db
+           image: campsite_pg
+           container_name: campsitepg-db
            volumes:
             - ${POSTGRES_HOST_DATA_DIR}:/var/lib/postgresql/data
            ports:
@@ -13,18 +13,18 @@ services:
             - POSTGRES_DB=${CAMPSITE_DB_NAME}
 
 
-        api:
-          image: upgrade-campsite-java-api
-          container_name: java-api
-          depends_on: 
-            - postgresql-db
-          ports:
-            - 8080:8080
-            - 5005:5005
-          environment:
-            - CAMPSITE_DB_POSTGRES_USER=${CAMPSITE_DB_POSTGRES_USER}
-            - CAMPSITE_DB_POSTGRES_PASSWORD=${CAMPSITE_DB_POSTGRES_PASSWORD}
-            - CAMPSITE_DB_NAME=${CAMPSITE_DB_NAME}
-            - CAMPSITE_DB_POSTGRES_HOST=pg-db
-            - CAMPSITE_DB_POSTGRES_PORT=${CAMPSITE_DB_POSTGRES_PORT}
-            - POSTGRES_HOST_DATA_DIR=${POSTGRES_HOST_DATA_DIR}
+#        api:
+#          image: upgrade-campsite-java-api
+#          container_name: java-api
+#          depends_on:
+#            - postgresql-db
+#          ports:
+#            - 8080:8080
+#            - 5005:5005
+#          environment:
+#            - CAMPSITE_DB_POSTGRES_USER=${CAMPSITE_DB_POSTGRES_USER}
+#            - CAMPSITE_DB_POSTGRES_PASSWORD=${CAMPSITE_DB_POSTGRES_PASSWORD}
+#            - CAMPSITE_DB_NAME=${CAMPSITE_DB_NAME}
+#            - CAMPSITE_DB_POSTGRES_HOST=pg-db
+#            - CAMPSITE_DB_POSTGRES_PORT=${CAMPSITE_DB_POSTGRES_PORT}
+#            - POSTGRES_HOST_DATA_DIR=${POSTGRES_HOST_DATA_DIR}

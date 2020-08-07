@@ -31,7 +31,7 @@ public class RegistrationConstraints {
         return (StringUtils.isBlank(availabilityFrom) || StringUtils.isBlank(availabilityTo)) && allowBlankDates;
     }
 
-    private static RegistrationDays parseDates(String availabilityFrom, String availabilityTo) {
+    private static RegistrationDays parseDates(String availabilityFrom, String availabilityTo) throws IllegalArgumentException{
         try {
             LocalDate fromDate = LocalDate.parse(availabilityFrom, DateTimeFormatter.ISO_DATE);
             LocalDate toDate = LocalDate.parse(availabilityTo, DateTimeFormatter.ISO_DATE);
@@ -41,7 +41,7 @@ public class RegistrationConstraints {
         }
     }
 
-    private static void validateChronologicalOrder(RegistrationDays parseDates) {
+    private static void validateChronologicalOrder(RegistrationDays parseDates) throws IllegalArgumentException{
         boolean verifyDateOrder = parseDates.getArrivalDate().isBefore(parseDates.getDepartureDate()) ||
                 parseDates.getArrivalDate().isEqual(parseDates.getDepartureDate());
         if (!verifyDateOrder) {
@@ -58,7 +58,7 @@ public class RegistrationConstraints {
         return registrationDays;
     }
 
-    private static void verifyMaximum3DayRegistration(RegistrationDays registrationDays) {
+    private static void verifyMaximum3DayRegistration(RegistrationDays registrationDays) throws IllegalArgumentException{
         long numberOfReservedDays = ChronoUnit.DAYS.between(registrationDays.getArrivalDate(), registrationDays.getDepartureDate());
 
         if (numberOfReservedDays > MAXIMUM_NUMBER_OF_CONSECUTIVE_DAYS) {
@@ -66,16 +66,16 @@ public class RegistrationConstraints {
         }
     }
 
-    private static void verifyArrivalatLeastOneDayAhead(RegistrationDays registrationDays) {
+    private static void verifyArrivalatLeastOneDayAhead(RegistrationDays registrationDays) throws IllegalArgumentException{
         LocalDate today = LocalDate.now();
         if (today.isEqual(registrationDays.getArrivalDate()) || today.isAfter(registrationDays.getArrivalDate())) {
             throw new IllegalArgumentException("You must reserve at least one day in advance. Earliest day to try must be " + today.plusDays(1));
         }
     }
 
-    public static void verifyArrivalMaximum1MonthInAdvance (RegistrationDays registrationDays){
+    public static void verifyArrivalMaximum1MonthInAdvance (RegistrationDays registrationDays) throws IllegalArgumentException{
         LocalDate oneMonthInAdvance = LocalDate.now().plusMonths(1);
-        if (oneMonthInAdvance.isAfter(registrationDays.getArrivalDate())) {
+        if (!oneMonthInAdvance.isAfter(registrationDays.getArrivalDate())) {
             throw new IllegalArgumentException("Arrival date is too far ahead. You can only reserve for a maximum of one month in advance, which would be " + oneMonthInAdvance);
         }
     }

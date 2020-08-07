@@ -1,10 +1,12 @@
-CREATE USER campsite_rw WITH
+CREATE USER camperapi_test WITH
   LOGIN
   NOSUPERUSER
   INHERIT
   NOCREATEDB
   NOCREATEROLE
   NOREPLICATION;
+
+ALTER USER camperapi_test WITH PASSWORD 'camperapi_test';
 
 
 CREATE TABLE public.camper
@@ -20,19 +22,24 @@ WITH (
 )
 TABLESPACE pg_default;
 
-GRANT ALL ON TABLE public.camper TO campsite_rw;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.camper TO campsite_rw;
+GRANT ALL ON TABLE public.camper TO camperapi_test;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.camper TO camperapi_test;
+
+CREATE UNIQUE INDEX camper_email_idx
+    ON public.camper
+        USING btree (email);
 
 
 
 CREATE TABLE public.registration
 (
+  id serial NOT NULL,
   booking_id text NOT NULL,
   camper_id text NOT NULL,
   reservation_date  date NOT NULL,
   created timestamp without time zone DEFAULT now(),
   modified timestamp without time zone DEFAULT now(),
-  CONSTRAINT registration_id_pkey PRIMARY KEY (booking_id),
+  CONSTRAINT registration_id_pkey PRIMARY KEY (id),
   CONSTRAINT fk_registration_camper_id FOREIGN KEY (camper_id)
     REFERENCES public.camper (id) MATCH SIMPLE
     ON UPDATE CASCADE ON DELETE CASCADE
@@ -42,5 +49,9 @@ CREATE TABLE public.registration
   )
   TABLESPACE pg_default;
 
-GRANT ALL ON TABLE public.registration TO campsite_rw;
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE public.registration TO campsite_rw;
+GRANT ALL ON TABLE public.registration TO camperapi_test;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE public.registration TO camperapi_test;
+
+CREATE UNIQUE INDEX registration_reservation_date_idx
+    ON public.registration
+        USING btree (reservation_date);
