@@ -19,7 +19,7 @@ public class CamperService {
         this.camperDao = camperDao;
     }
 
-    @Transactional
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
     public Camper createOrRetrieveCamper(@Valid Camper camper) {
         Optional<Camper> camperByEmail = camperDao.findByEmail(camper.getEmail());
 

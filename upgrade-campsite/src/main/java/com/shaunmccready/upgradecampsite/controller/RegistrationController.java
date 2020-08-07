@@ -47,6 +47,15 @@ public class RegistrationController {
         return ResponseEntity.created(location).body(reservedDates);
     }
 
+    @PutMapping("/{bookingId}")
+    public ResponseEntity<List<Registration>> modifyReservation(@PathVariable("bookingId") String bookingId,
+                                                                @RequestParam("from") String fromDate,
+                                                                @RequestParam("to") String toDate) {
+        List<Registration> modifiedReservedDates = registrationService.modifyReservation(bookingId, fromDate, toDate);
+
+        return ResponseEntity.ok(modifiedReservedDates);
+    }
+
     @DeleteMapping("/{bookingId}")
     public ResponseEntity<List<Registration>> cancelReservation(@PathVariable("bookingId") String bookingId) {
         List<Registration> cancelledDates = registrationService.cancelReservation(bookingId);
