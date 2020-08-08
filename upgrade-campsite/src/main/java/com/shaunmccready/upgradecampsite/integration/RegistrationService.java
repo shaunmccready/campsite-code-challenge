@@ -1,4 +1,4 @@
-package com.shaunmccready.upgradecampsite.service;
+package com.shaunmccready.upgradecampsite.integration;
 
 import com.shaunmccready.upgradecampsite.domain.AvailableDays;
 import com.shaunmccready.upgradecampsite.domain.Camper;
@@ -50,7 +50,7 @@ public class RegistrationService {
     }
 
     @Transactional
-    public List<Registration> reserveCamp(final String fromDate, final String toDate, final Camper camper) throws ReservationException {
+    public List<Registration> reserveCampsite(final String fromDate, final String toDate, final Camper camper) throws ReservationException {
         RegistrationDays registrationDays = RegistrationConstraints.validateAndProcessForReservation(fromDate, toDate);
         verifyNoConflictingReservations(registrationDays);
 
@@ -70,14 +70,14 @@ public class RegistrationService {
 
     @Transactional
     protected List<Registration> createRegistrationsToReserve(final Camper camper, final RegistrationDays registrationDays) {
-        return createRegistrationsToReserve(camper,registrationDays, null);
+        return createRegistrationsToReserve(camper, registrationDays, null);
     }
 
     @Transactional
     protected List<Registration> createRegistrationsToReserve(final Camper camper, final RegistrationDays registrationDays, final String bookingId) {
         List<Registration> daysToReserve = new ArrayList<>();
         long daysBetween = ChronoUnit.DAYS.between(registrationDays.getArrivalDate(), registrationDays.getDepartureDate());
-        String bookingIdOfNewRegistration = StringUtils.isNotBlank(bookingId)? bookingId : UUID.randomUUID().toString();
+        String bookingIdOfNewRegistration = StringUtils.isNotBlank(bookingId) ? bookingId : UUID.randomUUID().toString();
 
         Stream.iterate(registrationDays.getArrivalDate(), d -> d.plusDays(1))
                 .limit(daysBetween + 1)

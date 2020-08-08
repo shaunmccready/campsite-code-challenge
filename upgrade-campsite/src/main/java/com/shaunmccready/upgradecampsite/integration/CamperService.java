@@ -1,4 +1,4 @@
-package com.shaunmccready.upgradecampsite.service;
+package com.shaunmccready.upgradecampsite.integration;
 
 import com.shaunmccready.upgradecampsite.domain.Camper;
 import com.shaunmccready.upgradecampsite.repository.CamperDao;

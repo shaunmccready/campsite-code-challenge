@@ -31,6 +31,15 @@ public class Camper implements Serializable {
     @OneToMany(mappedBy = "camper")
     private Set<Registration> registrations;
 
+    public Camper() {
+    }
+
+    public static Camper of(String email, String name) {
+        Camper camper = new Camper();
+        camper.setEmail(email);
+        camper.setName(name);
+        return camper;
+    }
 
     public String getId() {
         return id;

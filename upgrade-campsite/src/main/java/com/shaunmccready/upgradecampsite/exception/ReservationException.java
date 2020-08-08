@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Exception thats thrown when a client tries to reserve a day thats already taken
+ * Exception thats thrown when a client tries to reserve a day that's already taken
  */
 @ResponseStatus(HttpStatus.CONFLICT)
 public class ReservationException extends RuntimeException {
