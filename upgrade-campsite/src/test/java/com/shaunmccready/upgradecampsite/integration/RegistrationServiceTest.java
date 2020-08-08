@@ -4,17 +4,24 @@ import com.shaunmccready.upgradecampsite.domain.AvailableDays;
 import com.shaunmccready.upgradecampsite.domain.Camper;
 import com.shaunmccready.upgradecampsite.domain.Registration;
 import com.shaunmccready.upgradecampsite.repository.RegistrationDao;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.TransactionSystemException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -53,6 +60,7 @@ public class RegistrationServiceTest {
     }
 
     @Test
+    @Rollback
     public void reserveCampsiteTest_passingAllRequiredFields_SUCCESS() {
         Camper camper = Camper.of("fake@fake.com", "John Smith");
         LocalDate fromDate = LocalDate.now().plusDays(1);
@@ -67,6 +75,7 @@ public class RegistrationServiceTest {
     }
 
     @Test
+    @Rollback
     public void reserveCampsiteTest_missingRequiredFields_FAIL() {
         Camper camper = new Camper();
         camper.setEmail("fake@fake.com");
@@ -80,6 +89,7 @@ public class RegistrationServiceTest {
     }
 
     @Test
+    @Rollback
     public void reserveCampsiteTest_reserveMoreThan3Days_FAIL() {
         Camper camper = Camper.of("fake@fake.com", "John Smith");
         LocalDate fromDate = LocalDate.now().plusDays(1);
@@ -91,6 +101,7 @@ public class RegistrationServiceTest {
     }
 
     @Test
+    @Rollback
     public void reserveCampsiteTest_reserveMinimumOneDayAdvanceArrival_FAIL() {
         Camper camper = Camper.of("fake@fake.com", "John Smith");
         LocalDate fromDate = LocalDate.now();
@@ -102,6 +113,7 @@ public class RegistrationServiceTest {
     }
 
     @Test
+    @Rollback
     public void reserveCampsiteTest_reserveMaximumOneMonthAdvanceArrival_FAIL() {
         Camper camper = Camper.of("fake@fake.com", "John Smith");
         LocalDate fromDate = LocalDate.now().plusMonths(1);
@@ -113,6 +125,7 @@ public class RegistrationServiceTest {
     }
 
     @Test
+    @Rollback
     public void cancelReservationTest_passingAllRequiredFields_SUCCESS() {
         Camper camper = Camper.of("fake@fake.com", "John Smith");
         LocalDate fromDate = LocalDate.now().plusDays(1);
@@ -133,6 +146,7 @@ public class RegistrationServiceTest {
     }
 
     @Test
+    @Rollback
     public void modifyReservationTest_passingAvaiableDaysAndExistingBookingId_SUCCESS() {
         Camper camper = Camper.of("fake@fake.com", "John Smith");
         LocalDate originalFromDate = LocalDate.now().plusDays(1);
@@ -157,14 +171,69 @@ public class RegistrationServiceTest {
 
         List<Registration> findByBookingId = registrationDao.findByBookingId(originalBookingId);
         long count = findByBookingId.stream()
-                .filter(registration -> {
-                    return registration.getReservationDate().equals(originalFromDate) ||
-                            registration.getReservationDate().equals(originalToDate);
-                })
+                .filter(registration ->
+                        registration.getReservationDate().equals(originalFromDate) ||
+                        registration.getReservationDate().equals(originalToDate))
                 .count();
 
         Assertions.assertThat(count).isEqualTo(0);
     }
 
+    @Disabled
+    @Test
+    @Rollback
+    public void concurrentRequestsToReserveTest() {
+
+        Callable callable = () -> {
+            String random = RandomStringUtils.random(5, true, true);
+            String email = random + "@" + random + ".com";
+
+            Camper camper = Camper.of(email, "John Smith");
+
+            LocalDate fromDate = LocalDate.now().plusDays(1);
+            LocalDate toDate = LocalDate.now().plusDays(2);
+
+            return registrationService.reserveCampsite(fromDate.toString(), toDate.toString(), camper);
+        };
+
+        int totalthreads = 10;
+        int totalRequests = 1000;
+        int waitTimeForThread = 100;
+        ExecutorService executorService = Executors.newFixedThreadPool(totalthreads);
+
+        List<Future<List<Registration>>> registrationRequests = Collections.synchronizedList(new ArrayList<>(totalRequests));
+        for (int i = 0; i < totalRequests; i++) {
+            registrationRequests.add(executorService.submit(callable));
+        }
+
+        List<List<Registration>> resultOfConcurrentReserves = Collections.synchronizedList(new ArrayList<>(totalRequests));
+
+        AtomicInteger failedRequests = new AtomicInteger(0);
+        for (Future<List<Registration>> registrationFuture : registrationRequests) {
+            while (!registrationFuture.isDone()) {
+                try {
+                    Thread.sleep(waitTimeForThread);
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
+            }
+            try {
+                resultOfConcurrentReserves.add(registrationFuture.get());
+            } catch (InterruptedException e) {
+                failedRequests.incrementAndGet();
+            } catch (ExecutionException e) {
+                failedRequests.incrementAndGet();
+            }
+        }
+
+        executorService.shutdown();
+
+        Assertions.assertThat(resultOfConcurrentReserves).isNotEmpty();
+        Assertions.assertThat(resultOfConcurrentReserves.get(0)).isNotEmpty();
+        Assertions.assertThat(resultOfConcurrentReserves.get(0).size()).isEqualTo(2);
+
+        //Only one reservation should be successful. The rest should all fail because of data constraints within the DB
+        Assertions.assertThat(failedRequests.get()).isEqualTo(totalRequests - 1);
+    }
 
 }
