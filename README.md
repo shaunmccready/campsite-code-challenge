@@ -2,19 +2,19 @@
 
 ## Installation
 
-##Step 1
+## Step 1
 Clone this github project to your machine
 
-##Step 2
+## Step 2
 You need to edit the .env file (hidden file in the root directory of this project) and change the environment variable POSTGRES_HOST_DATA_DIR to an accessible temp directory on your local machine
 
-##Step 3
+## Step 3
 - Give the script `init_project.sh` executable permissions using `chmod a+x init_project.sh`
 - Run the `init_project.sh` bash script located in the root directory which will set everything up. If it doesn't work, the manual steps are listed below
     
     *Only run this once. If it doesn't work successfully then go into each of the 2 project folders and follow the manual installation instructions of the README.md files*
 
-##Step 4
+## Step 4
 Run the command `docker-compose up` to start everything up. Then query the end-points 
 
 ***
