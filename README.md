@@ -44,14 +44,17 @@ Run the command `docker-compose up` to start everything up. Then query the end-p
   - /api/registration   <-- the root mapping
   
   - [GET] /api/registration/availability    <-- gives you the availability of the passed date range. If no range passed, then default is 1 month.
-  query parameters to pass
+  query parameters to pass: `to` and `from` in the format YYYY-MM-DD
+    - Example: `localhost:8080/api/registration/availability?from=2020-08-15&to=2020-08-30`
   
   - [POST] /api/registration/reserve  <-- this reserves the dates passed via `to` and `from` in the format YYYY-MM-DD. In the body of the request, you must pass the payload as mentioned below in the example.  
+    - Example: `localhost:8080/api/registration/reserve?from=2020-08-15&to=2020-08-16`
   
   - [PUT] /api/registration/{bookingId}  <-- this is for modifying an existing reservation with the booking ID. Dates passed via `to` and `from` in the format YYYY-MM-DD will replace the existing dates of the reservation 
+    - Example: `localhost:8080/api/registration/569f1310-caf8-426c-ada6-c8822f8226c0?from=2020-08-15&to=2020-08-16`  
   
   - [DELETE] /api/registration/{bookingId}  <-- This is for cancelling a reservation
-  
+    - Example: `localhost:8080/api/registration/54ed0aa0-65ed-491e-aded-6a08d73df5b0`
   
   
   ### Example payload when doing POST or PUT calls
