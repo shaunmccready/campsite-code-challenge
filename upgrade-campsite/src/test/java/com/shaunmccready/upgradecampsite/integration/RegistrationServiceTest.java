@@ -60,7 +60,6 @@ public class RegistrationServiceTest {
     }
 
     @Test
-    @Rollback
     public void reserveCampsiteTest_passingAllRequiredFields_SUCCESS() {
         Camper camper = Camper.of("fake@fake.com", "John Smith");
         LocalDate fromDate = LocalDate.now().plusDays(1);
@@ -75,7 +74,6 @@ public class RegistrationServiceTest {
     }
 
     @Test
-    @Rollback
     public void reserveCampsiteTest_missingRequiredFields_FAIL() {
         Camper camper = new Camper();
         camper.setEmail("fake@fake.com");
@@ -89,7 +87,6 @@ public class RegistrationServiceTest {
     }
 
     @Test
-    @Rollback
     public void reserveCampsiteTest_reserveMoreThan3Days_FAIL() {
         Camper camper = Camper.of("fake@fake.com", "John Smith");
         LocalDate fromDate = LocalDate.now().plusDays(1);
@@ -101,7 +98,6 @@ public class RegistrationServiceTest {
     }
 
     @Test
-    @Rollback
     public void reserveCampsiteTest_reserveMinimumOneDayAdvanceArrival_FAIL() {
         Camper camper = Camper.of("fake@fake.com", "John Smith");
         LocalDate fromDate = LocalDate.now();
@@ -113,7 +109,6 @@ public class RegistrationServiceTest {
     }
 
     @Test
-    @Rollback
     public void reserveCampsiteTest_reserveMaximumOneMonthAdvanceArrival_FAIL() {
         Camper camper = Camper.of("fake@fake.com", "John Smith");
         LocalDate fromDate = LocalDate.now().plusMonths(1);
@@ -125,7 +120,6 @@ public class RegistrationServiceTest {
     }
 
     @Test
-    @Rollback
     public void cancelReservationTest_passingAllRequiredFields_SUCCESS() {
         Camper camper = Camper.of("fake@fake.com", "John Smith");
         LocalDate fromDate = LocalDate.now().plusDays(1);
@@ -146,7 +140,6 @@ public class RegistrationServiceTest {
     }
 
     @Test
-    @Rollback
     public void modifyReservationTest_passingAvaiableDaysAndExistingBookingId_SUCCESS() {
         Camper camper = Camper.of("fake@fake.com", "John Smith");
         LocalDate originalFromDate = LocalDate.now().plusDays(1);
@@ -181,7 +174,6 @@ public class RegistrationServiceTest {
 
     @Disabled
     @Test
-    @Rollback
     public void concurrentRequestsToReserveTest() {
 
         Callable callable = () -> {
