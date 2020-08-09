@@ -190,8 +190,8 @@ public class RegistrationServiceTest {
 
             Camper camper = Camper.of(email, "John Smith");
 
-            LocalDate fromDate = LocalDate.now().plusDays(1);
-            LocalDate toDate = LocalDate.now().plusDays(2);
+            LocalDate fromDate = LocalDate.now().plusDays(28);
+            LocalDate toDate = LocalDate.now().plusDays(29);
 
             return registrationService.reserveCampsite(fromDate.toString(), toDate.toString(), camper);
         };
@@ -230,6 +230,8 @@ public class RegistrationServiceTest {
 
         Assertions.assertThat(resultOfConcurrentReserves).isNotEmpty();
         Assertions.assertThat(resultOfConcurrentReserves.get(0)).isNotEmpty();
+
+        // The only reservation that was successful and thats 2 records, 1 per day
         Assertions.assertThat(resultOfConcurrentReserves.get(0).size()).isEqualTo(2);
 
         //Only one reservation should be successful. The rest should all fail because of data constraints within the DB
