@@ -16,7 +16,7 @@
 
     <properties>
         <apache.commons.lang3.version>3.9</apache.commons.lang3.version>
-        <java.version>11</java.version>
+        <java.version>08</java.version>
         <test.containers.version>1.14.3</test.containers.version>
     </properties>
 
